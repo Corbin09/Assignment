@@ -1,95 +1,117 @@
-import java.util.*;
-import java.lang.*;
+import java.util.Scanner;
 
-class BigNum
-{
-    public static int Int(char c) {
-        if (c >= '0' && c <= '9') {
-            return c - '0';
-        } else {
-            throw new IllegalArgumentException("Input character is not a digit.");
-        }
-    }
-
-    public static void main (String[] args) throws java.lang.Exception
-    {
+public class BigNum {
+    public static void main(String[] args) throws java.lang.Exception{
         Scanner inp = new Scanner(System.in);
         String a = inp.nextLine();
         String b = inp.nextLine();
-
-        while (true){
-            if (a.length() == b.length()) break;
-            if(a.length() < b.length()){
-                a = "0" + a;
-            }
-            else{
-                b = "0" + b;
-            }
-        }
-        System.out.println(a);
-        System.out.println(b);
-//        System.out.println(Sum(a,b));
-        System.out.println(Minus(a,b));
+        System.out.println(Sum(a, b));
+        System.out.println(Minus(a, b));
+        System.out.print(Time(a, b));
     }
 
     public static String Sum(String a, String b){
-        int point = 0;
-        int val = 0;
-        String result = "";
-        for(int i = a.length()-1; i >= 0; i--){
-            val = Int(a.charAt(i)) + Int(b.charAt(i)) + point;
-            if(point != 0)
-                point = 0;
-            if(val >= 10){
-                point = 1;
-                val %= 10;
-                result = String.valueOf(val) + result;
-                continue;
-            }
-            result = String.valueOf(val) + result;
+       while(a.length() != b.length()){
+                if(a.length() < b.length())
+                    a = '0' + a;
+                else {
+                    b = '0' + b;
+                }
         }
-        if(point != 0)
-            result = "1" + result;
-        return result;
+        StringBuilder s = new StringBuilder();
+        int x = 0;
+        for(int i = a.length()-1; i >= 0; i --){
+            if(i != 0){
+                int A = a.charAt(i) - '0';
+                int B = b.charAt(i) - '0';
+                int sum = A + B + x;
+                x = sum / 10;
+                s.insert(0, sum % 10);
+            } else {
+                int A = a.charAt(i) - '0';
+                int B = b.charAt(i) - '0';
+                int sum = A + B + x;
+                s.insert(0, sum);
+            }
+        }
+        return s.toString();
     }
 
     public static String Minus(String a, String b){
-        int point = 0;
-        String result = "";
+        boolean check = false;
+        if(a.length() < b.length()){
+            check = true;
+        } else if (a.length() == b.length()){
+            for(int i = 0; i < a.length(); i++){
+                if(a.charAt(i) - '0' < b.charAt(i) - '0'){
+                    check = true;
+                    break;
+                } else if (a.charAt(i) - '0' > b.charAt(i) - '0') {
+                    break;
+                }
+            }
+        }
+        while(a.length() != b.length()){
+            if(a.length() < b.length())
+                a = '0' + a;
+            else
+                b = '0' + b;
+        }
+        int x = 0;
+        StringBuilder s = new StringBuilder();
+        for(int i = a.length()-1; i >= 0; i --){
+            int A = a.charAt(i) - '0';
+            int B = b.charAt(i) - '0';
+            int val = 0;
+            if(check){
+                 val = B - A - x;
+            }else val = A - B - x;
+            if(i != 0) {
+                if(val >= 0) {
+                    s.insert(0, val);
+                    x = 0;
+                }
+                else {
+                    s.insert(0, val + 10);
+                    x = 1;
+                }
+            }  else {
+                    s.insert(0, val);
+                }
+        }
+        while(s.charAt(0) == '0' && s.length()>1){
+            s.delete(0, 1);
+        }
+        if(check)
+            s.insert(0, '-');
+        return s.toString();
+    }
+
+    public static String TimeOneDigit(String a, char b){
+        StringBuilder s = new StringBuilder();
+        int x = 0;
         int val = 0;
-        int check = 0;
-        for(int i = 0; i <= a.length()-1; i++){
-            if(Int(a.charAt(i)) < Int(b.charAt(i))){
-                check = -1;
-                break;
-            }
-            if(Int(a.charAt(i)) > Int(b.charAt(i))){
-                check = 1;
-                break;
-            }
-        }
-        String c = "";
-        if(check == -1){
-            c = a;
-            a = b;
-            b = c;
-        }
         for(int i = a.length()-1; i >= 0; i--){
-            val = Int(a.charAt(i)) + 10 - Int(b.charAt(i)) - point;
-            if(point != 0)
-                point = 0;
-            if(val < 10)
-                point++;
-            if(i == 0 && val % 10 == 0)
-                break;
-            result = String.valueOf(val % 10) + result;
+            int A = a.charAt(i) - '0';
+            int B = b - '0';
+            val = A * B + x;
+            if(i != 0) {
+                s.insert(0, val % 10);
+                x = val / 10;
+            } else s.insert(0, val);
         }
-        if(check == -1)
-            return '-' + result;
-        return result;
+        return s.toString();
     }
 
     public static String Time(String a, String b){
-        return "";
+        String z = "";
+        String A = "";
+        String B = "";
+        for(int i = b.length()-1; i >= 0; i--){
+            A = TimeOneDigit(a, b.charAt(i)) + z;
+            B = Sum(A, B);
+            z += '0';
+        }
+        return B;
     }
 }
